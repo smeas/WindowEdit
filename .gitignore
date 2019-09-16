@@ -1,0 +1,12 @@
+
+# Dirs
+.idea/**
+.vs/**
+packages/**
+*/bin/**
+*/obj/**
+
+# Files
+*.user
+
+
