@@ -17,7 +17,7 @@ namespace WindowEdit {
 		private bool topmost;
 
 		private readonly DispatcherTimer windowCheckTimer = new DispatcherTimer {
-			Interval = TimeSpan.FromSeconds(2)
+			Interval = TimeSpan.FromSeconds(1)
 		};
 
 		#region Properties
@@ -248,6 +248,7 @@ namespace WindowEdit {
 		}
 
 		private void RefreshWindowData() {
+			if (TargetWindow == null) return;
 			if (User32.GetWindowRect(TargetWindow.Handle, out User32.RECT wr)) {
 				WindowPosition = wr.Position;
 				WindowSize = wr.Size;
