@@ -194,7 +194,7 @@ namespace WindowEdit {
 				User32.SetWindowPos(hwnd, IntPtr.Zero, 0, 0, wr.Width - 1, wr.Height - 1,
 					User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOACTIVATE);
 
-			SetWindowTopMost(hwnd, true);
+			//SetWindowTopMost(hwnd, true);
 			User32.SetWindowPos(hwnd, IntPtr.Zero, mon.rcMonitor.X, mon.rcMonitor.Y, mon.rcMonitor.Width, mon.rcMonitor.Height,
 				User32.SetWindowPosFlags.SWP_NOACTIVATE);
 
