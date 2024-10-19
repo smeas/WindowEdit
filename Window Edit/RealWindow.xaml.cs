@@ -7,6 +7,13 @@ namespace WindowEdit {
 	public partial class RealWindow : Window {
 		public RealWindow() {
 			InitializeComponent();
+			ClearSelectedProfile = new Command(DoClearSelectedProfile);
+		}
+
+		public Command ClearSelectedProfile { get; }
+
+		private void DoClearSelectedProfile() {
+			ProfilesListBox.UnselectAll();
 		}
 	}
 }

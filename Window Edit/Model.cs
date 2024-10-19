@@ -1,11 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
+using Newtonsoft.Json;
 using Window_Edit;
 using Window_Edit.Annotations;
 using WindowEdit.Interop;
+using WindowEdit.Properties;
+using Xceed.Wpf.Toolkit;
 
 namespace WindowEdit {
 	internal class Model : INotifyPropertyChanged {
@@ -16,6 +20,8 @@ namespace WindowEdit {
 		private POINT windowPosition;
 		private bool topmost;
 
+		private string profileName = "New Profile";
+
 		private readonly DispatcherTimer windowCheckTimer = new DispatcherTimer {
 			Interval = TimeSpan.FromSeconds(1)
 		};
@@ -23,6 +29,12 @@ namespace WindowEdit {
 		#region Properties
 
 		public ObservableCollection<WindowInfo> WindowList { get; } = new ObservableCollection<WindowInfo>();
+
+		public ObservableCollection<WindowProfile> WindowProfiles { get; } = new ObservableCollection<WindowProfile>() {
+			new WindowProfile(),
+			new WindowProfile(),
+			new WindowProfile(),
+		};
 
 		public WindowInfo TargetWindow {
 			get => targetWindow;
@@ -104,6 +116,16 @@ namespace WindowEdit {
 			}
 		}
 
+
+		public string ProfileName {
+			get => profileName;
+			set {
+				if (value == profileName) return;
+				profileName = value;
+				OnPropertyChanged();
+			}
+		}
+
 		#endregion
 
 		#region Commands
@@ -116,6 +138,10 @@ namespace WindowEdit {
 		public Command BorderlessFullscreenCommand => new Command(BorderlessFullscreen);
 		public Command RefreshWindowsCommand => new Command(RefreshWindowList);
 		public ParamCommand SelectWindowCommand => new ParamCommand(SelectWindow);
+
+		public Command CreateProfile => new Command(DoCreateProfile);
+		public Command1<WindowProfile> RemoveProfile => new Command1<WindowProfile>(DeleteProfile);
+		public Command1<WindowProfile> SelectProfile => new Command1<WindowProfile>(ApplyProfile);
 
 		private void SetPos() {
 			User32.SetWindowPos(TargetWindow.Handle, IntPtr.Zero, WinPosX, WinPosY, 0, 0,
@@ -218,6 +244,40 @@ namespace WindowEdit {
 			}
 		}
 
+
+		private void DoCreateProfile() {
+			if (string.IsNullOrEmpty(profileName))
+				return;
+
+			WindowProfiles.Add(new WindowProfile() {
+				Name = profileName,
+				PosX = WinPosX, PosY = WinPosY,
+				SizeX = WinWidth, SizeY = WinHeight,
+				Topmost = Topmost,
+			});
+			SaveProfiles();
+		}
+
+		private void ApplyProfile(WindowProfile profile) {
+			if (profile == null)
+				return;
+
+			WinPosX = profile.PosX;
+			WinPosY = profile.PosY;
+			WinWidth = profile.SizeX;
+			WinHeight = profile.SizeY;
+			Topmost = profile.Topmost;
+			SetPos();
+			SetSize();
+			TopMostCheck();
+		}
+
+		private void DeleteProfile(WindowProfile profile) {
+
+			WindowProfiles.Remove(profile);
+			SaveProfiles();
+		}
+
 		#endregion
 
 		#region Helpers
@@ -237,6 +297,7 @@ namespace WindowEdit {
 		public Model() {
 			windowCheckTimer.Tick += WindowCheck;
 			RefreshWindowList();
+			LoadProfiles();
 		}
 
 		private void WindowCheck(object sender, EventArgs e) {
@@ -255,6 +316,32 @@ namespace WindowEdit {
 			}
 
 			Topmost = GetWindowTopMost(TargetWindow.Handle);
+		}
+
+		private void LoadProfiles() {
+			WindowProfiles.Clear();
+
+			string json = Settings.Default.SavedProfiles;
+			if (string.IsNullOrWhiteSpace(json))
+				return;
+
+			List<WindowProfile> loadedProfiles;
+			try {
+				 loadedProfiles = JsonConvert.DeserializeObject<List<WindowProfile>>(json);
+			} catch (Exception) {
+				/* do nothing */
+				return;
+			}
+
+			foreach (WindowProfile profile in loadedProfiles) {
+				WindowProfiles.Add(profile);
+			}
+		}
+
+		private void SaveProfiles() {
+			string json = JsonConvert.SerializeObject(WindowProfiles);
+			Settings.Default.SavedProfiles = json;
+			Settings.Default.Save();
 		}
 
 		[NotifyPropertyChangedInvocator]
