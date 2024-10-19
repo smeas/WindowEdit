@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace WindowEdit {
 	/// <summary>
@@ -7,13 +8,13 @@ namespace WindowEdit {
 	public partial class RealWindow : Window {
 		public RealWindow() {
 			InitializeComponent();
-			ClearSelectedProfile = new Command(DoClearSelectedProfile);
 		}
 
-		public Command ClearSelectedProfile { get; }
-
-		private void DoClearSelectedProfile() {
-			ProfilesListBox.UnselectAll();
+		private void OnWindowProfilePressed(object sender, MouseButtonEventArgs e) {
+			object pressedProfile = ((FrameworkElement)sender).DataContext;
+			if (pressedProfile != null) {
+				((Model)DataContext).SelectProfile.Execute(pressedProfile);
+			}
 		}
 	}
 }
