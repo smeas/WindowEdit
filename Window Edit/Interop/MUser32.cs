@@ -5,7 +5,7 @@ using Window_Edit;
 using Window_Edit.Annotations;
 
 namespace WindowEdit.Interop {
-	public class User32 {
+	public class MUser32 {
 		public static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
 		public static readonly IntPtr HWND_NOTOPMOST = new IntPtr(-2);
 		public static readonly IntPtr HWND_TOP = new IntPtr(0);
@@ -1626,7 +1626,7 @@ namespace WindowEdit.Interop {
 
 			public static MONITORINFOEX Create() {
 				return new MONITORINFOEX {
-					cbSize = Marshal.SizeOf(typeof(User32.MONITORINFOEX))
+					cbSize = Marshal.SizeOf(typeof(MUser32.MONITORINFOEX))
 				};
 			}
 		}

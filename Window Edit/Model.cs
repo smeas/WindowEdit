@@ -118,13 +118,13 @@ namespace WindowEdit {
 		public ParamCommand SelectWindowCommand => new ParamCommand(SelectWindow);
 
 		private void SetPos() {
-			User32.SetWindowPos(TargetWindow.Handle, IntPtr.Zero, WinPosX, WinPosY, 0, 0,
-				User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOACTIVATE);
+			MUser32.SetWindowPos(TargetWindow.Handle, IntPtr.Zero, WinPosX, WinPosY, 0, 0,
+				MUser32.SetWindowPosFlags.SWP_NOSIZE | MUser32.SetWindowPosFlags.SWP_NOACTIVATE);
 		}
 
 		private void SetSize() {
-			User32.SetWindowPos(TargetWindow.Handle, IntPtr.Zero, 0, 0, WinWidth, WinHeight,
-				User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOACTIVATE);
+			MUser32.SetWindowPos(TargetWindow.Handle, IntPtr.Zero, 0, 0, WinWidth, WinHeight,
+				MUser32.SetWindowPosFlags.SWP_NOMOVE | MUser32.SetWindowPosFlags.SWP_NOACTIVATE);
 		}
 
 		private void TopMostCheck() {
@@ -135,12 +135,12 @@ namespace WindowEdit {
 			IntPtr hwnd = TargetWindow.Handle;
 			if (hwnd == IntPtr.Zero) return;
 
-			IntPtr hmon = User32.MonitorFromWindow(hwnd, User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
-			User32.MONITORINFO mon = User32.MONITORINFO.Create();
+			IntPtr hmon = MUser32.MonitorFromWindow(hwnd, MUser32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
+			MUser32.MONITORINFO mon = MUser32.MONITORINFO.Create();
 
-			if (!User32.GetWindowRect(hwnd, out User32.RECT wr) ||
-				!User32.GetClientRect(hwnd, out User32.RECT cr) ||
-				!User32.GetMonitorInfo(hmon, ref mon))
+			if (!MUser32.GetWindowRect(hwnd, out MUser32.RECT wr) ||
+				!MUser32.GetClientRect(hwnd, out MUser32.RECT cr) ||
+				!MUser32.GetMonitorInfo(hmon, ref mon))
 				return;
 
 			SIZE ws = wr.Size;
@@ -157,54 +157,54 @@ namespace WindowEdit {
 				ny = mon.rcMonitor.Y;
 			}
 
-			User32.SetWindowPos(hwnd, IntPtr.Zero, nx, ny, 0, 0,
-				User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOACTIVATE);
+			MUser32.SetWindowPos(hwnd, IntPtr.Zero, nx, ny, 0, 0,
+				MUser32.SetWindowPosFlags.SWP_NOSIZE | MUser32.SetWindowPosFlags.SWP_NOACTIVATE);
 
 			RefreshWindowData();
 		}
 
 		private void RemoveBorder() {
 			IntPtr hwnd = TargetWindow.Handle;
-			int style = User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE);
-			style &= unchecked((int)~(User32.WindowStyles.WS_CAPTION | User32.WindowStyles.WS_THICKFRAME | User32.WindowStyles.WS_MINIMIZEBOX |
-				User32.WindowStyles.WS_MAXIMIZEBOX | User32.WindowStyles.WS_SYSMENU));
-			User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_STYLE, style);
+			int style = MUser32.GetWindowLong(hwnd, MUser32.WindowLongIndexFlags.GWL_STYLE);
+			style &= unchecked((int)~(MUser32.WindowStyles.WS_CAPTION | MUser32.WindowStyles.WS_THICKFRAME | MUser32.WindowStyles.WS_MINIMIZEBOX |
+				MUser32.WindowStyles.WS_MAXIMIZEBOX | MUser32.WindowStyles.WS_SYSMENU));
+			MUser32.SetWindowLong(hwnd, MUser32.WindowLongIndexFlags.GWL_STYLE, style);
 
-			style = User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
-			style &= unchecked((int)~(User32.WindowStylesEx.WS_EX_DLGMODALFRAME | User32.WindowStylesEx.WS_EX_CLIENTEDGE |
-				User32.WindowStylesEx.WS_EX_STATICEDGE));
-			User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, style);
+			style = MUser32.GetWindowLong(hwnd, MUser32.WindowLongIndexFlags.GWL_EXSTYLE);
+			style &= unchecked((int)~(MUser32.WindowStylesEx.WS_EX_DLGMODALFRAME | MUser32.WindowStylesEx.WS_EX_CLIENTEDGE |
+				MUser32.WindowStylesEx.WS_EX_STATICEDGE));
+			MUser32.SetWindowLong(hwnd, MUser32.WindowLongIndexFlags.GWL_EXSTYLE, style);
 			RefreshWindowData();
 		}
 
 		private void BorderlessFullscreen() {
 			IntPtr hwnd = TargetWindow.Handle;
 			
-			IntPtr hmon = User32.MonitorFromWindow(hwnd, User32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
-			User32.MONITORINFO mon = User32.MONITORINFO.Create();
+			IntPtr hmon = MUser32.MonitorFromWindow(hwnd, MUser32.MonitorOptions.MONITOR_DEFAULTTONEAREST);
+			MUser32.MONITORINFO mon = MUser32.MONITORINFO.Create();
 
 			RemoveBorder();
 
-			if (!User32.GetWindowRect(hwnd, out User32.RECT wr) ||
-				!User32.GetClientRect(hwnd, out User32.RECT cr) ||
-				!User32.GetMonitorInfo(hmon, ref mon))
+			if (!MUser32.GetWindowRect(hwnd, out MUser32.RECT wr) ||
+				!MUser32.GetClientRect(hwnd, out MUser32.RECT cr) ||
+				!MUser32.GetMonitorInfo(hmon, ref mon))
 				return;
 
 			if (wr.Size == mon.rcMonitor.Size)
-				User32.SetWindowPos(hwnd, IntPtr.Zero, 0, 0, wr.Width - 1, wr.Height - 1,
-					User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOACTIVATE);
+				MUser32.SetWindowPos(hwnd, IntPtr.Zero, 0, 0, wr.Width - 1, wr.Height - 1,
+					MUser32.SetWindowPosFlags.SWP_NOMOVE | MUser32.SetWindowPosFlags.SWP_NOACTIVATE);
 
 			//SetWindowTopMost(hwnd, true);
-			User32.SetWindowPos(hwnd, IntPtr.Zero, mon.rcMonitor.X, mon.rcMonitor.Y, mon.rcMonitor.Width, mon.rcMonitor.Height,
-				User32.SetWindowPosFlags.SWP_NOACTIVATE);
+			MUser32.SetWindowPos(hwnd, IntPtr.Zero, mon.rcMonitor.X, mon.rcMonitor.Y, mon.rcMonitor.Width, mon.rcMonitor.Height,
+				MUser32.SetWindowPosFlags.SWP_NOACTIVATE);
 
 			RefreshWindowData();
 		}
 
 		private void RefreshWindowList() {
 			WindowList.Clear();
-			User32.EnumWindows(delegate(IntPtr hwnd, IntPtr lParam) {
-				if (hwnd != IntPtr.Zero && User32.IsWindow(hwnd) && User32.IsWindowVisible(hwnd))
+			MUser32.EnumWindows(delegate(IntPtr hwnd, IntPtr lParam) {
+				if (hwnd != IntPtr.Zero && MUser32.IsWindow(hwnd) && MUser32.IsWindowVisible(hwnd))
 					WindowList.Add(new WindowInfo(hwnd));
 
 				return true;
@@ -223,13 +223,13 @@ namespace WindowEdit {
 		#region Helpers
 
 		private static bool GetWindowTopMost(IntPtr hwnd) {
-			int style = User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
-			return (style & (int)User32.WindowStylesEx.WS_EX_TOPMOST) != 0;
+			int style = MUser32.GetWindowLong(hwnd, MUser32.WindowLongIndexFlags.GWL_EXSTYLE);
+			return (style & (int)MUser32.WindowStylesEx.WS_EX_TOPMOST) != 0;
 		}
 
 		private static void SetWindowTopMost(IntPtr hwnd, bool top) {
-			User32.SetWindowPos(hwnd, top ? User32.HWND_TOPMOST : User32.HWND_NOTOPMOST, 0, 0, 0, 0,
-				User32.SetWindowPosFlags.SWP_NOMOVE | User32.SetWindowPosFlags.SWP_NOSIZE | User32.SetWindowPosFlags.SWP_NOACTIVATE);
+			MUser32.SetWindowPos(hwnd, top ? MUser32.HWND_TOPMOST : MUser32.HWND_NOTOPMOST, 0, 0, 0, 0,
+				MUser32.SetWindowPosFlags.SWP_NOMOVE | MUser32.SetWindowPosFlags.SWP_NOSIZE | MUser32.SetWindowPosFlags.SWP_NOACTIVATE);
 		}
 
 		#endregion
@@ -249,7 +249,7 @@ namespace WindowEdit {
 
 		private void RefreshWindowData() {
 			if (TargetWindow == null) return;
-			if (User32.GetWindowRect(TargetWindow.Handle, out User32.RECT wr)) {
+			if (MUser32.GetWindowRect(TargetWindow.Handle, out MUser32.RECT wr)) {
 				WindowPosition = wr.Position;
 				WindowSize = wr.Size;
 			}
