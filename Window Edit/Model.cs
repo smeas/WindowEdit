@@ -137,6 +137,7 @@ namespace WindowEdit {
 		public Command RemoveBorderCommand => new Command(RemoveBorder);
 		public Command BorderlessFullscreenCommand => new Command(BorderlessFullscreen);
 		public Command RefreshWindowsCommand => new Command(RefreshWindowList);
+		public Command RefreshWindowDataCommand => new Command(RefreshWindowData);
 		public ParamCommand SelectWindowCommand => new ParamCommand(SelectWindow);
 
 		public Command CreateProfile => new Command(DoCreateProfile);
