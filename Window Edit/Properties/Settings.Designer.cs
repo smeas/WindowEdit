@@ -21,17 +21,5 @@ namespace WindowEdit.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SavedProfiles {
-            get {
-                return ((string)(this["SavedProfiles"]));
-            }
-            set {
-                this["SavedProfiles"] = value;
-            }
-        }
     }
 }

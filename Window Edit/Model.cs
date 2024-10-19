@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using Newtonsoft.Json;
@@ -14,6 +15,10 @@ using Xceed.Wpf.Toolkit;
 namespace WindowEdit {
 	internal class Model : INotifyPropertyChanged {
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		private static readonly string settingsDirectory = Path.Combine(
+			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WindowEdit");
+		private static readonly string profilesSettingsFile = Path.Combine(settingsDirectory, "profiles.json");
 
 		private WindowInfo targetWindow;
 		private SIZE windowSize;
@@ -322,15 +327,19 @@ namespace WindowEdit {
 		private void LoadProfiles() {
 			WindowProfiles.Clear();
 
-			string json = Settings.Default.SavedProfiles;
-			if (string.IsNullOrWhiteSpace(json))
-				return;
-
 			List<WindowProfile> loadedProfiles;
 			try {
-				 loadedProfiles = JsonConvert.DeserializeObject<List<WindowProfile>>(json);
-			} catch (Exception) {
+				if (!File.Exists(profilesSettingsFile))
+					return;
+
+				string json = File.ReadAllText(profilesSettingsFile);
+				if (string.IsNullOrWhiteSpace(json))
+					return;
+
+				loadedProfiles = JsonConvert.DeserializeObject<List<WindowProfile>>(json);
+			} catch (Exception e) {
 				/* do nothing */
+				Console.WriteLine(e);
 				return;
 			}
 
@@ -341,8 +350,17 @@ namespace WindowEdit {
 
 		private void SaveProfiles() {
 			string json = JsonConvert.SerializeObject(WindowProfiles);
-			Settings.Default.SavedProfiles = json;
-			Settings.Default.Save();
+
+			try
+			{
+				Directory.CreateDirectory(settingsDirectory);
+				File.WriteAllText(profilesSettingsFile, json);
+			}
+			catch (Exception e)
+			{
+				/* do nothing */
+				Console.WriteLine(e);
+			}
 		}
 
 		[NotifyPropertyChangedInvocator]

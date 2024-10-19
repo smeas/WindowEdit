@@ -3,10 +3,6 @@
   <Profiles>
     <Profile Name="(Default)" />
   </Profiles>
-  <Settings>
-    <Setting Name="SavedProfiles" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-  </Settings>
+  <Settings />
 </SettingsFile>
 
